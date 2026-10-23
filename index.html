@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Absences – prototype TPE</title>
+<title>Absences</title>
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <style>
-:root{--bg:#f4f7fc;--card:#fff;--ink:#14213d;--mut:#5b6a86;--line:#dde4f0;--pri:#1f5fe0;--pri2:#e6eeff;--warn:#fff3d6;--warnt:#8a5a00;--bad:#c92a2a;--badbg:#fdeaea;--ok:#e3f6ea;--okt:#17653a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1626;--card:#172036;--ink:#e8edf8;--mut:#9aa8c4;--line:#2a3856;--pri:#6b9bff;--pri2:#1e2f57;--warn:#3a2e10;--warnt:#f2c46a;--bad:#ff8a8a;--badbg:#3b1c1f;--ok:#14301f;--okt:#7fd9a1;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#0f1626;--card:#172036;--ink:#e8edf8;--mut:#9aa8c4;--line:#2a3856;--pri:#6b9bff;--pri2:#1e2f57;--warn:#3a2e10;--warnt:#f2c46a;--bad:#ff8a8a;--badbg:#3b1c1f;--ok:#14301f;--okt:#7fd9a1;color-scheme:dark}
-*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+:root{--bg:#f4f7fc;--card:#fff;--ink:#14213d;--mut:#5b6a86;--line:#dde4f0;--pri:#1f5fe0;--pri2:#e6eeff;--warn:#fff3d6;--warnt:#8a5a00;--bad:#c92a2a;--badbg:#fdeaea;--ok:#e3f6ea;--okt:#17653a}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1626;--card:#172036;--ink:#e8edf8;--mut:#9aa8c4;--line:#2a3856;--pri:#6b9bff;--pri2:#1e2f57;--warn:#3a2e10;--warnt:#f2c46a;--bad:#ff8a8a;--badbg:#3b1c1f;--ok:#14301f;--okt:#7fd9a1;color-scheme:dark}}
+*{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Figtree,system-ui,sans-serif}
 header{display:flex;align-items:center;gap:20px;flex-wrap:wrap;padding:12px 24px;background:var(--card);border-bottom:1px solid var(--line)}
 .logo{font-weight:700;font-size:18px;color:var(--pri)}
@@ -21,7 +21,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .badge{background:var(--bad);color:#fff;border-radius:10px;padding:0 7px;font-size:12px;margin-left:6px}
 main{max-width:1100px;margin:0 auto;padding:24px 16px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:20px}
-h2{margin:0 0 12px;font-size:20px}h3{margin:0 0 10px;font-size:16px}
+h2{margin:0 0 12px;font-size:20px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}@media(max-width:760px){.grid{grid-template-columns:1fr}}
 label{display:block;font-weight:500;margin:10px 0 4px}
 input,select{font:inherit;width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
@@ -34,8 +34,12 @@ input,select{font:inherit;width:100%;padding:9px 11px;border:1px solid var(--lin
 .wrap{overflow-x:auto}table{border-collapse:collapse;min-width:100%}
 th,td{border:1px solid var(--line);text-align:center;font-size:12px;min-width:26px;height:34px;padding:0}
 th{background:var(--bg);font-weight:500;color:var(--mut)}
-th.n,td.n{position:sticky;left:0;background:var(--card);text-align:left;padding:0 12px;min-width:130px;font-size:14px;z-index:1}
-.dim{background:var(--bg)}.r{background:var(--line)}td.c{position:relative}td.c i{position:absolute;left:0;right:0;top:0;bottom:0}td.c i.m{bottom:50%}td.c i.a{top:50%}.cp{--k:var(--pri)}.rp{--k:#f08c00}.hr{--k:#e64980}i.ok{background:var(--k)}i.p{background:repeating-linear-gradient(45deg,var(--k) 0 2px,transparent 2px 5px);box-shadow:inset 0 0 0 1px var(--k)}
+th.n,td.n{position:sticky;left:0;background:var(--card);text-align:left;padding:0 12px;min-width:150px;font-size:14px;z-index:1}
+.dim{background:var(--bg)}.r{background:var(--line)}
+td.c{position:relative}td.c i{position:absolute;left:0;right:0;top:0;bottom:0}td.c i.m{bottom:50%}td.c i.a{top:50%}
+.cp{--k:var(--pri)}.rp{--k:#f08c00}.hr{--k:#e64980}
+i.ok{background:var(--k)}
+i.p{background:repeating-linear-gradient(45deg,var(--k) 0 2px,transparent 2px 5px);box-shadow:inset 0 0 0 1px var(--k)}
 th.al{background:var(--badbg);color:var(--bad);font-weight:700}
 .leg{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--mut);margin-top:12px}.leg i{display:inline-block;width:14px;height:14px;vertical-align:-2px;margin-right:5px;border-radius:3px}
 .login{max-width:380px;margin:12vh auto}
@@ -44,67 +48,113 @@ th.al{background:var(--badbg);color:var(--bad);font-weight:700}
 <body>
 <div id="app"></div>
 <script>
+/* ============ CONFIGURATION : à remplir (Supabase > Project Settings > API) ============ */
+const CFG={url:'https://gfoyhkdhuyhbwtyboyvj.supabase.co',key:'sb_publishable_lVQ8brecEn_9rU3qvf_R2A_VnEVOkyM'};
+const MAILS={maxime:'maxime.coste@boisdarcy.leclerc',benedicte:'benedicte.canteux@boisdarcy.leclerc'};
+/* ======================================================================================== */
 const $=s=>document.querySelector(s),iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'),pd=s=>new Date(s+'T12:00:00'),addD=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function* rng(a,b){for(let d=pd(a);d<=pd(b);d=addD(d,1))yield new Date(d)}
-const nd=(a,b)=>{let n=0;for(const d of rng(a,b))if(d.getDay())n++;return n}; // jours ouvrables : lun-sam
+const nd=(a,b)=>{let n=0;for(const d of rng(a,b))if(d.getDay())n++;return n}; // jours ouvrables : lundi au samedi
 const fr=s=>pd(s).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
-const T=new Date(),off=n=>iso(addD(T,n));
+const T=new Date();
 const ST={manager:'En attente du manager',dirigeant:'En attente du dirigeant',ok:'Validée',ko:'Refusée'};
-const DAYS=['dim','lun','mar','mer','jeu','ven','sam'];
-function seed(){const u=(id,name,role,rest,rep)=>({id,name,role,rest,rep,pw:id+'123'});
-return{start:off(0),users:[u('benedicte','Bénédicte Canteux (dirigeant)','D',-1,17),u('maxime','Maxime Coste (manager)','M',-1,7),u('judith','Judith Almeida Cabo','E',-1,11),u('johaina','Johaina Bensalem','E',-1,3),u('annelise','Anne-Lise Gorriez','E',-1,12),u('magali','Magali Minar','E',-1,14),u('meriem','Meriem Rarrbo','E',-1,7)],reqs:[]}}
-let S;try{S=JSON.parse(localStorage.getItem('abs-v2'))}catch(e){}if(!S)S=seed();
-const save=()=>{try{localStorage.setItem('abs-v2',JSON.stringify(S))}catch(e){}};
-let db=null;
-const cfg=()=>{if(db)db.doc('team/config').set({start:S.start,users:S.users}).catch(()=>{})};
-let ERR='',NOTE=null;const MAILS={maxime:'maxime.coste@leclercvoyages.com',benedicte:'benedicte.canteux@leclercvoyages.com'};
-function mailBanner(){const r=NOTE,u=U(r.uid),n=u.name.split(' (')[0],to=(u.role==='E'?['maxime','benedicte']:['benedicte']).map(k=>MAILS[k]),s=encodeURIComponent(TY[ty(r)]+' – '+n),b=encodeURIComponent('Bonjour,\n\n'+n+' a fait une demande : '+fmt(r)+'.\n\nMerci de la traiter dans l’application Absences.\n');return`<div class="note" style="margin:12px 24px 0;background:var(--ok);color:var(--okt)">Demande envoyée. <a href="mailto:${to.join(',')}?subject=${s}&body=${b}" target="_blank" rel="noopener" style="color:inherit;font-weight:600">Prévenir par email</a> (${to.join(', ')}) <button class="btn sec sm" id="nx2" style="margin-left:8px">Fermer</button></div>`}
-const sync=(r,del)=>{if(db)(del?db.doc('reqs/'+r.id).delete():db.doc('reqs/'+r.id).set(r)).catch(()=>{ERR='Enregistrement impossible : votre accès à la page doit être « Contributeur ».';ref()})};
-const cl=o=>JSON.parse(JSON.stringify(o));
-function ref(){if(!me)return;me=U(me.id)||me;const a=document.activeElement;if(a&&a.closest&&a.closest('#m')&&/INPUT|SELECT/.test(a.tagName))return;render()}
-let me=null,view='plan',mo=0,msg='';
+const DAYS=['dim','lun','mar','mer','jeu','ven','sam'],RL={D:'dirigeant',M:'manager',E:'salarié'};
+const TY={cp:'Congés payés',rp:'Repos',hr:"Demande d'horaires"},CPMAX=2,HF={m:'matin',a:'après-midi'};
+const nm=(()=>{const d=addD(T,7);while(d.getDay()!==1)d.setDate(d.getDate()+1);return d})();
+let F={type:'cp',a:iso(nm),c:iso(addD(nm,2)),h:'m'};
+let sb=null,S={users:[],reqs:[]},me=null,view='plan',mo=0,msg='',ERR='',NOTE=null,ready=false,setup=false;
 const U=id=>S.users.find(u=>u.id===id);
-const live=r=>r.status!=='ko';
-const pend=r=>r.status==='manager'||r.status==='dirigeant';
-function acq(){const s=pd(S.start);let m=(T.getFullYear()-s.getFullYear())*12+T.getMonth()-s.getMonth();if(T.getDate()<s.getDate())m--;return Math.max(0,2.5*m)}
-function bal(u){const my=S.reqs.filter(r=>r.uid===u.id&&ty(r)==='cp');const taken=my.filter(r=>r.status==='ok').reduce((s,r)=>s+nd(r.from,r.to),0),wait=my.filter(pend).reduce((s,r)=>s+nd(r.from,r.to),0);return{rep:u.rep,acq:acq(),taken,wait,left:u.rep+acq()-taken-wait}}
-const ty=r=>r.type||'cp',TY={cp:'Congés payés',rp:'Repos',hr:"Demande d'horaires"},CPMAX=2,HF={m:'matin',a:'après-midi'};
-const nm=(()=>{const d=addD(T,7);while(d.getDay()!==1)d.setDate(d.getDate()+1);return d})();let F={type:'cp',a:iso(nm),c:iso(addD(nm,2)),h:'m'};
+const live=r=>r.status!=='ko',pend=r=>r.status==='manager'||r.status==='dirigeant',ty=r=>r.type||'cp';
+function acq(u){const s=pd(u.since);let m=(T.getFullYear()-s.getFullYear())*12+T.getMonth()-s.getMonth();if(T.getDate()<s.getDate())m--;return Math.max(0,2.5*m)}
+function bal(u){const my=S.reqs.filter(r=>r.uid===u.id&&ty(r)==='cp');const taken=my.filter(r=>r.status==='ok').reduce((s,r)=>s+nd(r.from,r.to),0),wait=my.filter(pend).reduce((s,r)=>s+nd(r.from,r.to),0),a=acq(u);return{rep:+u.rep,acq:a,taken,wait,left:+u.rep+a-taken-wait}}
+function absent(date,exceptUid){return S.reqs.filter(r=>live(r)&&ty(r)!=='hr'&&r.uid!==exceptUid&&r.from<=date&&date<=r.to&&pd(date).getDay()).map(r=>U(r.uid)).filter(Boolean)}
+function overlaps(uid,a,b){const o={};for(const d of rng(a,b)){const k=iso(d);absent(k,uid).forEach(u=>{(o[u.name]=o[u.name]||[]).push(k)})}return o}
+const ovHTML=o=>Object.entries(o).map(([n,ds])=>`Chevauchement avec ${esc(n)} (${fr(ds[0])}${ds.length>1?' au '+fr(ds[ds.length-1]):''})`).join('<br>');
 const fmt=r=>{const t=ty(r);return TY[t]+' · '+(t==='hr'?fr(r.from)+' ('+HF[r.half]+')':fr(r.from)+' → '+fr(r.to)+' · '+nd(r.from,r.to)+' j')};
 function conflict(t,a,c,h){return S.reqs.some(r=>{if(r.uid!==me.id||!live(r))return false;if(ty(r)==='hr'&&t==='hr')return r.from===a&&r.half===h;return r.from<=c&&a<=r.to})}
-function absent(date,exceptUid){return S.reqs.filter(r=>live(r)&&ty(r)!=='hr'&&r.uid!==exceptUid&&r.from<=date&&date<=r.to&&pd(date).getDay()).map(r=>U(r.uid))}
-function overlaps(uid,a,b){const o={};for(const d of rng(a,b)){const k=iso(d);absent(k,uid).forEach(u=>{(o[u.name]=o[u.name]||[]).push(k)})}return o}
-const ovHTML=o=>Object.entries(o).map(([n,ds])=>`Chevauchement avec ${n} (${fr(ds[0])}${ds.length>1?' au '+fr(ds[ds.length-1]):''})`).join('<br>');
-function render(){const A=$('#app');
-if(!me){A.innerHTML=`<div class="login card"><div class="logo">Absences</div><h2>Connexion</h2><label for="lu">Utilisateur</label><select id="lu">${S.users.map(u=>`<option value="${u.id}">${u.name}</option>`).join('')}</select><label for="lp">Mot de passe</label><input id="lp" type="password" autocomplete="off"><p class="mut">Mot de passe : prénom en minuscules, sans accent ni tiret, suivi de 123 (ex. benedicte123, annelise123).</p>${msg?`<div class="note bad">${msg}</div>`:''}<p><button class="btn" id="go">Se connecter</button></p></div>`;
-$('#go').onclick=()=>{const u=U($('#lu').value);if($('#lp').value===u.pw){me=u;msg='';view='plan';render()}else{msg='Mot de passe incorrect.';render()}};$('#lp').onkeydown=e=>{if(e.key==='Enter')$('#go').click()};return}
-const todo=toValidate().length;
-A.innerHTML=`<header><span class="logo">Absences</span><nav><button data-v="plan" class="${view==='plan'?'on':''}">Planning</button><button data-v="mine" class="${view==='mine'?'on':''}">Mes demandes</button>${me.role!=='E'?`<button data-v="val" class="${view==='val'?'on':''}">À valider${todo?`<span class="badge">${todo}</span>`:''}</button>`:''}${me.role==='D'?`<button data-v="team" class="${view==='team'?'on':''}">Équipe</button>`:''}</nav><span class="mut">${me.name}</span><button class="btn sec sm" id="out">Quitter</button>${me.role==='D'?'<button class="btn sec sm" id="rst">Réinitialiser</button>':''}</header>${ERR?`<div class="note bad" style="margin:12px 24px 0">${ERR}</div>`:''}${NOTE?mailBanner():''}<main id="m"></main>`;
-A.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{view=b.dataset.v;render()});
-if($('#nx2'))$('#nx2').onclick=()=>{NOTE=null;render()};$('#out').onclick=()=>{me=null;NOTE=null;render()};if($('#rst'))$('#rst').onclick=()=>{const old=S.reqs;S=seed();save();cfg();old.forEach(r=>sync(r,1));me=null;render()};
-({plan,mine,val,team})[view]()}
+
+/* ---------- Données (Supabase) ---------- */
+async function load(){
+  const [p,r]=await Promise.all([sb.from('profiles').select('*'),sb.from('requests').select('*')]);
+  if(p.error||r.error)throw (p.error||r.error);
+  const o={D:0,M:1,E:2};
+  S.users=p.data.sort((a,b)=>o[a.role]-o[b.role]||a.name.localeCompare(b.name));
+  S.reqs=r.data.map(x=>({id:x.id,uid:x.uid,type:x.type,from:x.from_date,to:x.to_date,half:x.half,status:x.status,by:x.by_role}));
+}
+async function act(q){ // exécute une écriture, recharge, réaffiche
+  const {error}=await q;ERR=error?'Action refusée : '+error.message:'';
+  try{await load()}catch(e){ERR='Chargement impossible : '+e.message}
+  me=U(me.id)||me;render();
+}
+async function enter(id){
+  await load();me=U(id)||null;
+  if(!me){msg='Votre compte n’a pas encore de profil : contactez l’administrateur.';await sb.auth.signOut()}
+}
+function ref(){if(!me)return;me=U(me.id)||me;const a=document.activeElement;if(a&&a.closest&&a.closest('#m')&&/INPUT|SELECT/.test(a.tagName))return;render()}
+async function init(){
+  if(!window.supabase||CFG.url.includes('VOTRE')){setup=true;ready=true;render();return}
+  sb=supabase.createClient(CFG.url,CFG.key);
+  try{const {data}=await sb.auth.getSession();if(data.session)await enter(data.session.user.id)}catch(e){msg='Chargement impossible : '+e.message}
+  ready=true;render();
+  sb.channel('live').on('postgres_changes',{event:'*',schema:'public'},()=>{if(me)load().then(ref).catch(()=>{})}).subscribe();
+}
+
+/* ---------- Interface ---------- */
+function mailBanner(){const r=NOTE,u=U(r.uid),n=u.name,to=u.role==='E'?[MAILS.maxime,MAILS.benedicte]:[MAILS.benedicte],s=encodeURIComponent(TY[ty(r)]+' – '+n),b=encodeURIComponent('Bonjour,\n\n'+n+' a fait une demande : '+fmt(r)+'.\n\nMerci de la traiter dans l’application Absences.\n');
+return`<div class="note" style="margin:12px 24px 0;background:var(--ok);color:var(--okt)">Demande envoyée. <a href="mailto:${to.join(',')}?subject=${s}&body=${b}" target="_blank" rel="noopener" style="color:inherit;font-weight:600">Prévenir par email</a> (${to.join(', ')}) <button class="btn sec sm" id="nx2" style="margin-left:8px">Fermer</button></div>`}
 function toValidate(){return S.reqs.filter(r=>(me.role==='M'&&r.status==='manager')||(me.role==='D'&&r.status==='dirigeant'))}
-function team(){const D=[[-1,'Aucun'],[1,'Lundi'],[2,'Mardi'],[3,'Mercredi'],[4,'Jeudi'],[5,'Vendredi'],[6,'Samedi'],[0,'Dimanche']];$('#m').innerHTML=`<div class="card"><h2>Équipe</h2><p class="mut">Jour de repos fixe et solde de départ (en jours) de chaque personne.</p>${S.users.map(u=>`<div class="row"><b>${u.name}</b><span><select style="width:auto" data-rest="${u.id}" aria-label="Jour de repos">${D.map(([v,l])=>`<option value="${v}"${u.rest===v?' selected':''}>${l}</option>`).join('')}</select> <input type="number" step="0.5" min="0" style="width:90px" value="${u.rep}" data-rep="${u.id}" aria-label="Solde de départ"></span></div>`).join('')}</div>`;document.querySelectorAll('[data-rest]').forEach(x=>x.onchange=()=>{U(x.dataset.rest).rest=+x.value;save();cfg()});document.querySelectorAll('[data-rep]').forEach(x=>x.onchange=()=>{U(x.dataset.rep).rep=+x.value||0;save();cfg()})}
+function render(){const A=$('#app');
+if(!ready){A.innerHTML='<p class="mut" style="padding:24px">Chargement…</p>';return}
+if(setup){A.innerHTML='<div class="login card"><h2>Configuration requise</h2><p>Ouvrez <b>index.html</b> et remplacez <code>CFG.url</code> et <code>CFG.key</code> par l’adresse et la clé publique de votre projet Supabase.</p></div>';return}
+if(!me){A.innerHTML=`<div class="login card"><div class="logo">Absences</div><h2>Connexion</h2><label for="lu">Adresse email</label><input id="lu" type="email" autocomplete="username"><label for="lp">Mot de passe</label><input id="lp" type="password" autocomplete="current-password">${msg?`<div class="note bad">${esc(msg)}</div>`:''}<p><button class="btn" id="go">Se connecter</button></p></div>`;
+const go=async()=>{const {data,error}=await sb.auth.signInWithPassword({email:$('#lu').value.trim(),password:$('#lp').value});
+if(error){msg='Email ou mot de passe incorrect.';render();return}
+msg='';try{await enter(data.user.id)}catch(e){msg='Chargement impossible : '+e.message}view='plan';render()};
+$('#go').onclick=go;$('#lp').onkeydown=e=>{if(e.key==='Enter')go()};return}
+const todo=toValidate().length;
+A.innerHTML=`<header><span class="logo">Absences</span><nav><button data-v="plan" class="${view==='plan'?'on':''}">Planning</button><button data-v="mine" class="${view==='mine'?'on':''}">Mes demandes</button>${me.role!=='E'?`<button data-v="val" class="${view==='val'?'on':''}">À valider${todo?`<span class="badge">${todo}</span>`:''}</button>`:''}${me.role==='D'?`<button data-v="team" class="${view==='team'?'on':''}">Équipe</button>`:''}</nav><span class="mut">${esc(me.name)} (${RL[me.role]})</span><button class="btn sec sm" id="out">Quitter</button></header>${ERR?`<div class="note bad" style="margin:12px 24px 0">${esc(ERR)}</div>`:''}${NOTE?mailBanner():''}<main id="m"></main>`;
+A.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{view=b.dataset.v;render()});
+if($('#nx2'))$('#nx2').onclick=()=>{NOTE=null;render()};
+$('#out').onclick=async()=>{await sb.auth.signOut();me=null;NOTE=null;msg='';render()};
+({plan,mine,val,team})[view]()}
+function team(){const D=[[-1,'Aucun'],[1,'Lundi'],[2,'Mardi'],[3,'Mercredi'],[4,'Jeudi'],[5,'Vendredi'],[6,'Samedi'],[0,'Dimanche']];
+$('#m').innerHTML=`<div class="card"><h2>Équipe</h2><p class="mut">Jour de repos fixe et solde de départ (en jours) de chaque personne.</p>${S.users.map(u=>`<div class="row"><b>${esc(u.name)} <span class="mut">(${RL[u.role]})</span></b><span><select style="width:auto" data-rest="${u.id}" aria-label="Jour de repos">${D.map(([v,l])=>`<option value="${v}"${+u.rest===v?' selected':''}>${l}</option>`).join('')}</select> <input type="number" step="0.5" min="0" style="width:90px" value="${u.rep}" data-rep="${u.id}" aria-label="Solde de départ"></span></div>`).join('')}</div>`;
+document.querySelectorAll('[data-rest]').forEach(x=>x.onchange=()=>act(sb.from('profiles').update({rest:+x.value}).eq('id',x.dataset.rest)));
+document.querySelectorAll('[data-rep]').forEach(x=>x.onchange=()=>act(sb.from('profiles').update({rep:+x.value||0}).eq('id',x.dataset.rep)))}
 function plan(){const first=new Date(T.getFullYear(),T.getMonth()+mo,1),n=new Date(first.getFullYear(),first.getMonth()+1,0).getDate(),ds=[...Array(n)].map((_,i)=>iso(new Date(first.getFullYear(),first.getMonth(),i+1)));
 const head=ds.map(k=>{const c=absent(k).length,w=pd(k).getDay();return`<th class="${c>=2?'al':w?'':'dim'}" title="${c>=2?c+' absents ce jour':''}">${DAYS[w][0]}<br>${+k.slice(8)}</th>`}).join('');
-const rows=S.users.map(u=>`<tr><td class="n">${u.name.split(' (')[0]}</td>${ds.map(k=>{const w=pd(k).getDay(),rs=S.reqs.filter(r=>r.uid===u.id&&live(r)&&r.from<=k&&k<=r.to&&w);return`<td class="c ${w===u.rest&&!rs.length?'r':w?'':'dim'}">${rs.map(r=>`<i class="${ty(r)} ${r.status==='ok'?'ok':'p'}${ty(r)==='hr'?' '+r.half:''}"></i>`).join('')}</td>`}).join('')}</tr>`).join('');
+const rows=S.users.map(u=>`<tr><td class="n">${esc(u.name)}</td>${ds.map(k=>{const w=pd(k).getDay(),rs=S.reqs.filter(r=>r.uid===u.id&&live(r)&&r.from<=k&&k<=r.to&&w);return`<td class="c ${w===+u.rest&&!rs.length?'r':w?'':'dim'}">${rs.map(r=>`<i class="${ty(r)} ${r.status==='ok'?'ok':'p'}${ty(r)==='hr'?' '+r.half:''}"></i>`).join('')}</td>`}).join('')}</tr>`).join('');
 $('#m').innerHTML=`<div class="card"><div class="row"><h2>${first.toLocaleDateString('fr-FR',{month:'long',year:'numeric'})}</h2><span><button class="btn sec sm" id="pv">‹</button> <button class="btn sec sm" id="td">Aujourd’hui</button> <button class="btn sec sm" id="nx">›</button></span></div><div class="wrap"><table><tr><th class="n"></th>${head}</tr>${rows}</table></div><div class="leg"><span><i class="cp ok"></i>Congés payés</span><span><i class="rp ok"></i>Repos</span><span><i class="hr ok"></i>Demande d'horaires (demi-journée)</span><span><i class="cp p"></i><i class="rp p"></i><i class="hr p"></i>Hachuré : en attente · plein : validé par le dirigeant</span><span><i class="r"></i>Jour de repos fixe</span><span><i style="background:var(--badbg);border:1px solid var(--bad)"></i>2 absents ou plus</span></div></div>`;
 $('#pv').onclick=()=>{mo--;render()};$('#nx').onclick=()=>{mo++;render()};$('#td').onclick=()=>{mo=0;render()}}
 function mine(){const b=bal(me),my=S.reqs.filter(r=>r.uid===me.id).sort((a,c)=>c.from.localeCompare(a.from));
 $('#m').innerHTML=`<div class="grid"><div class="card"><h2>Mes soldes (jours ouvrables)</h2><div class="bal"><div><b>${b.left}</b><span>disponibles</span></div><div><b>${b.acq}</b><span>acquis depuis le démarrage (2,5 j/mois)</span></div><div><b>${b.rep}</b><span>solde de départ</span></div><div><b>${b.wait}</b><span>en attente</span></div></div></div>
 <div class="card"><h2>Nouvelle demande</h2><label for="f0">Type de demande</label><select id="f0">${Object.entries(TY).map(([k,l])=>`<option value="${k}"${F.type===k?' selected':''}>${l}</option>`).join('')}</select><label for="f1">${F.type==='hr'?'Date':'Du'}</label><input type="date" id="f1" value="${F.a}">${F.type==='hr'?`<label for="f3">Demi-journée</label><select id="f3"><option value="m"${F.h==='m'?' selected':''}>Matin</option><option value="a"${F.h==='a'?' selected':''}>Après-midi</option></select>`:`<label for="f2">Au (inclus)</label><input type="date" id="f2" value="${F.c}">`}<div id="pv"></div><p><button class="btn" id="sb">Envoyer la demande</button></p></div></div>
 <div class="card"><h2>Historique</h2>${my.length?my.map(r=>`<div class="row"><span>${fmt(r)}</span><span><span class="chip c-${r.status}">${ST[r.status]}</span> ${pend(r)?`<button class="btn bad sm" data-c="${r.id}">Annuler</button>`:''}</span></div>`).join(''):'<p class="mut">Aucune demande pour le moment. Posez votre premier congé ci-dessus.</p>'}</div>`;
-const pv=()=>{const t=F.type,a=F.a,c=t==='hr'?a:F.c;let h='',bad=0;const er=m=>{h+=`<div class="note bad">${m}</div>`;bad=1};if(!a||!c||c<a)er('La date de fin doit suivre la date de début.');else{const d=nd(a,c),o=t==='hr'?{}:overlaps(me.id,a,c),sd=pd(a).getDay(),ed=pd(c).getDay();if(t!=='hr')h=`<p><b>${d} jour${d>1?'s':''}</b>${t==='cp'?' ouvrable'+(d>1?'s':'')+' décompté'+(d>1?'s':'')+' (lundi au samedi)':''}.</p>`;if(!sd||!ed)er('Les dimanches ne peuvent pas être choisis.');if(t==='cp'){if(sd>CPMAX)er('Les congés payés ne peuvent pas commencer à partir du milieu de la semaine : départ le lundi ou le mardi.');if(d>b.left)er(`Solde insuffisant : il vous reste ${b.left} j.`)}if(conflict(t,a,c,F.h))er(t==='hr'?'Vous avez déjà une demande sur cette demi-journée.':'Vous avez déjà une demande sur ces dates.');if(Object.keys(o).length)h+=`<div class="note">⚠ ${ovHTML(o)}<br>Au moins 2 personnes seraient absentes.</div>`}$('#pv').innerHTML=h;$('#sb').disabled=bad;$('#sb').style.opacity=bad?.5:1};
+const pv=()=>{const t=F.type,a=F.a,c=t==='hr'?a:F.c;let h='',bad=0;const er=m=>{h+=`<div class="note bad">${m}</div>`;bad=1};
+if(!a||!c||c<a)er('La date de fin doit suivre la date de début.');
+else{const d=nd(a,c),o=t==='hr'?{}:overlaps(me.id,a,c),sd=pd(a).getDay(),ed=pd(c).getDay();
+if(t!=='hr')h=`<p><b>${d} jour${d>1?'s':''}</b>${t==='cp'?' ouvrable'+(d>1?'s':'')+' décompté'+(d>1?'s':'')+' (lundi au samedi)':''}.</p>`;
+if(!sd||!ed)er('Les dimanches ne peuvent pas être choisis.');
+if(t==='cp'){if(sd>CPMAX)er('Les congés payés ne peuvent pas commencer à partir du milieu de la semaine : départ le lundi ou le mardi.');if(d>b.left)er(`Solde insuffisant : il vous reste ${b.left} j.`)}
+if(conflict(t,a,c,F.h))er(t==='hr'?'Vous avez déjà une demande sur cette demi-journée.':'Vous avez déjà une demande sur ces dates.');
+if(Object.keys(o).length)h+=`<div class="note">⚠ ${ovHTML(o)}<br>Au moins 2 personnes seraient absentes.</div>`}
+$('#pv').innerHTML=h;$('#sb').disabled=bad;$('#sb').style.opacity=bad?.5:1};
 $('#f0').onchange=e=>{F.type=e.target.value;mine()};$('#f1').oninput=e=>{F.a=e.target.value;pv()};if($('#f2'))$('#f2').oninput=e=>{F.c=e.target.value;pv()};if($('#f3'))$('#f3').onchange=e=>{F.h=e.target.value;pv()};pv();
-$('#sb').onclick=()=>{const r={id:Date.now(),uid:me.id,type:F.type,from:F.a,to:F.type==='hr'?F.a:F.c,half:F.type==='hr'?F.h:null,status:me.role==='D'?'ok':me.role==='M'?'dirigeant':'manager'};S.reqs.push(r);save();sync(r);if(me.role!=='D')NOTE=r;view='plan';mo=(pd(r.from).getFullYear()-T.getFullYear())*12+pd(r.from).getMonth()-T.getMonth();render()};
-document.querySelectorAll('[data-c]').forEach(x=>x.onclick=()=>{const r=S.reqs.find(r=>r.id==x.dataset.c);S.reqs=S.reqs.filter(q=>q!==r);save();sync(r,1);render()})}
-function extra(){const w=S.reqs.filter(r=>r.status==='manager'),k=S.reqs.filter(r=>r.status==='ko'&&r.by==='M');const L=(a,f)=>a.map(r=>`<div class="row"><span><b>${U(r.uid).name.split(' (')[0]}</b> · ${fmt(r)}</span>${f(r)}</div>`).join('');return`<div class="card"><h2>En cours chez le manager</h2>${w.length?L(w,()=>'<span class="chip c-manager">En attente du manager</span>'):'<p class="mut">Aucune demande en cours chez le manager.</p>'}</div><div class="card"><h2>Refusées par le manager</h2>${k.length?L(k,r=>`<span><span class="chip c-ko">Refusée</span> <button class="btn sec sm" data-b="${r.id}">Réexaminer</button></span>`):'<p class="mut">Aucun refus du manager.</p>'}</div>`}
+$('#sb').onclick=()=>{const hr=F.type==='hr',status=me.role==='D'?'ok':me.role==='M'?'dirigeant':'manager';
+const r={uid:me.id,type:F.type,from:F.a,to:hr?F.a:F.c,half:hr?F.h:null,status};
+if(me.role!=='D')NOTE=r;view='plan';mo=(pd(r.from).getFullYear()-T.getFullYear())*12+pd(r.from).getMonth()-T.getMonth();
+act(sb.from('requests').insert({uid:r.uid,type:r.type,from_date:r.from,to_date:r.to,half:r.half,status}))};
+document.querySelectorAll('[data-c]').forEach(x=>x.onclick=()=>act(sb.from('requests').delete().eq('id',x.dataset.c)))}
+function extra(){const w=S.reqs.filter(r=>r.status==='manager'),k=S.reqs.filter(r=>r.status==='ko'&&r.by==='M');
+const L=(a,f)=>a.map(r=>`<div class="row"><span><b>${esc((U(r.uid)||{name:'?'}).name)}</b> · ${fmt(r)}</span>${f(r)}</div>`).join('');
+return`<div class="card"><h2>En cours chez le manager</h2>${w.length?L(w,()=>'<span class="chip c-manager">En attente du manager</span>'):'<p class="mut">Aucune demande en cours chez le manager.</p>'}</div><div class="card"><h2>Refusées par le manager</h2>${k.length?L(k,r=>`<span><span class="chip c-ko">Refusée</span> <button class="btn sec sm" data-b="${r.id}">Réexaminer</button></span>`):'<p class="mut">Aucun refus du manager.</p>'}</div>`}
 function val(){const l=toValidate();
-$('#m').innerHTML=`<div class="card"><h2>Demandes à valider</h2>${l.length?l.map(r=>{const u=U(r.uid),o=ty(r)==='hr'?{}:overlaps(r.uid,r.from,r.to);return`<div class="row"><div><b>${u.name.split(' (')[0]}</b> · ${fmt(r)}<br><span class="mut">${ty(r)==='cp'?'Solde actuel : '+bal(u).left+' j':''}${r.status==='dirigeant'&&u.role==='E'?' · déjà validé par le manager':''}</span>${Object.keys(o).length?`<div class="note">⚠ ${ovHTML(o)}</div>`:''}</div><span><button class="btn sm" data-a="${r.id}">Valider</button> <button class="btn bad sm" data-r="${r.id}">Refuser</button></span></div>`}).join(''):'<p class="mut">Tout est à jour : aucune demande en attente.</p>'}</div>${me.role==='D'?extra():''}`;
-document.querySelectorAll('[data-a]').forEach(x=>x.onclick=()=>{const r=S.reqs.find(r=>r.id==x.dataset.a);r.status=me.role==='M'?'dirigeant':'ok';save();sync(r);render()});
-document.querySelectorAll('[data-r]').forEach(x=>x.onclick=()=>{const r=S.reqs.find(r=>r.id==x.dataset.r);r.status='ko';r.by=me.role;save();sync(r);render()});document.querySelectorAll('[data-b]').forEach(x=>x.onclick=()=>{const r=S.reqs.find(r=>r.id==x.dataset.b);r.status='dirigeant';save();sync(r);render()})}
-render();
-(async()=>{try{db=await claude.use('db')}catch(e){}if(!db)return;db.doc('team/config').onSnapshot(s=>{if(s.exists){const d=cl(s.data());S.start=d.start;S.users=d.users;save();ref()}},()=>{});db.collection('reqs').onSnapshot(q=>{S.reqs=q.docs.map(d=>cl(d.data()));save();ref()},()=>{})})();
+$('#m').innerHTML=`<div class="card"><h2>Demandes à valider</h2>${l.length?l.map(r=>{const u=U(r.uid),o=ty(r)==='hr'?{}:overlaps(r.uid,r.from,r.to);return`<div class="row"><div><b>${esc(u.name)}</b> · ${fmt(r)}<br><span class="mut">${ty(r)==='cp'?'Solde actuel : '+bal(u).left+' j':''}${r.status==='dirigeant'&&u.role==='E'?' · déjà validé par le manager':''}</span>${Object.keys(o).length?`<div class="note">⚠ ${ovHTML(o)}</div>`:''}</div><span><button class="btn sm" data-a="${r.id}">Valider</button> <button class="btn bad sm" data-r="${r.id}">Refuser</button></span></div>`}).join(''):'<p class="mut">Tout est à jour : aucune demande en attente.</p>'}</div>${me.role==='D'?extra():''}`;
+document.querySelectorAll('[data-a]').forEach(x=>x.onclick=()=>act(sb.from('requests').update({status:me.role==='M'?'dirigeant':'ok'}).eq('id',x.dataset.a)));
+document.querySelectorAll('[data-r]').forEach(x=>x.onclick=()=>act(sb.from('requests').update({status:'ko',by_role:me.role}).eq('id',x.dataset.r)));
+document.querySelectorAll('[data-b]').forEach(x=>x.onclick=()=>act(sb.from('requests').update({status:'dirigeant'}).eq('id',x.dataset.b)))}
+init();
 </script>
 </body>
 </html>
