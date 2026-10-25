@@ -37,7 +37,7 @@ th{background:var(--bg);font-weight:500;color:var(--mut)}
 th.n,td.n{position:sticky;left:0;background:var(--card);text-align:left;padding:0 12px;min-width:150px;font-size:14px;z-index:1}
 .dim{background:var(--bg)}.r{background:var(--line)}
 td.c{position:relative}td.c i{position:absolute;left:0;right:0;top:0;bottom:0}td.c i.m{bottom:50%}td.c i.a{top:50%}
-.cp{--k:var(--pri)}.rp{--k:#f08c00}.hr{--k:#e64980}
+.cp{--k:var(--pri)}.rp{--k:#f08c00}.hr{--k:#e64980}.fo{--k:#2f9e44}
 i.ok{background:var(--k)}
 i.p{background:repeating-linear-gradient(45deg,var(--k) 0 2px,transparent 2px 5px);box-shadow:inset 0 0 0 1px var(--k)}
 th.al{background:var(--badbg);color:var(--bad);font-weight:700}
@@ -60,9 +60,9 @@ const fr=s=>pd(s).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
 const T=new Date();
 const ST={manager:'En attente du manager',dirigeant:'En attente du dirigeant',ok:'Validée',ko:'Refusée',annul:'Annulation demandée',annulee:'Annulée'};
 const DAYS=['dim','lun','mar','mer','jeu','ven','sam'],RL={D:'dirigeant',M:'manager',E:'salarié'};
-const TY={cp:'Congés payés',rp:'Repos',hr:"Demande d'horaires"},CPMAX=2,HF={m:'matin',a:'après-midi'};
+const TY={cp:'Congés payés',rp:'Repos',hr:"Demande d'horaires",fo:'Formation'},CPMAX=2,HF={m:'matin',a:'après-midi'};
 const nm=(()=>{const d=addD(T,7);while(d.getDay()!==1)d.setDate(d.getDate()+1);return d})();
-let F={type:'cp',a:iso(nm),c:iso(addD(nm,2)),h:'m'};
+let F={type:'cp',a:iso(nm),c:iso(addD(nm,2)),h:'m'},FO={uid:'',a:iso(nm),c:iso(addD(nm,4))};
 let sb=null,S={users:[],reqs:[]},me=null,view='plan',mo=0,msg='',ERR='',NOTE=null,SEL=[],FIRST=false,OKMSG='',ready=false,setup=false;
 const U=id=>S.users.find(u=>u.id===id);
 const live=r=>r.status!=='ko'&&r.status!=='annulee',pend=r=>r.status==='manager'||r.status==='dirigeant',ty=r=>r.type||'cp';
@@ -134,6 +134,7 @@ $('#m').innerHTML=`<div class="card"><h2>Équipe</h2><p class="mut">Jour de repo
 document.querySelectorAll('[data-rest]').forEach(x=>x.onchange=()=>act(sb.from('profiles').update({rest:+x.value}).eq('id',x.dataset.rest)));
 document.querySelectorAll('[data-rep]').forEach(x=>x.onchange=()=>act(sb.from('profiles').update({rep:+x.value||0}).eq('id',x.dataset.rep)))}
 function cancelBtn(r){
+if(ty(r)==='fo')return me.role==='E'?'<span class="mut">Formation planifiée</span>':`<button class="btn bad sm" data-d="${r.id}">Supprimer</button>`;
 if(r.status==='manager'||r.status==='dirigeant')return`<button class="btn bad sm" data-c="${r.id}">Annuler la demande</button>`;
 if(r.status==='ok')return`<button class="btn bad sm" data-x="${r.id}">${me.role==='D'?'Annuler':'Demander l’annulation'}</button>`;
 if(r.status==='annul')return`<span class="mut">En attente de décision (${me.role==='E'?'manager':'dirigeant'})</span>`;return''}
@@ -141,18 +142,19 @@ function panel(){const l=SEL.map(id=>S.reqs.find(r=>r.id===id)).filter(Boolean);
 return`<div class="card"><h2>Ma demande</h2>${l.map(r=>`<div class="row"><span>${fmt(r)}<br><span class="chip c-${r.status}">${ST[r.status]}</span></span><span>${cancelBtn(r)}</span></div>`).join('')}<p><button class="btn sec sm" id="cl">Fermer</button></p></div>`}
 function bindCancel(){
 document.querySelectorAll('[data-c]').forEach(x=>x.onclick=()=>{SEL=[];act(sb.from('requests').delete().eq('id',x.dataset.c))});
-document.querySelectorAll('[data-x]').forEach(x=>x.onclick=()=>{const r=S.reqs.find(q=>String(q.id)===x.dataset.x);if(me.role!=='D')NOTE=Object.assign({},r,{cancel:1});SEL=[];act(sb.from('requests').update({status:me.role==='D'?'annulee':'annul'}).eq('id',x.dataset.x))})}
+document.querySelectorAll('[data-x]').forEach(x=>x.onclick=()=>{const r=S.reqs.find(q=>String(q.id)===x.dataset.x);if(me.role!=='D')NOTE=Object.assign({},r,{cancel:1});SEL=[];act(sb.from('requests').update({status:me.role==='D'?'annulee':'annul'}).eq('id',x.dataset.x))});
+document.querySelectorAll('[data-d]').forEach(x=>x.onclick=()=>{SEL=[];act(sb.from('requests').delete().eq('id',x.dataset.d))})}
 function plan(){const first=new Date(T.getFullYear(),T.getMonth()+mo,1),n=new Date(first.getFullYear(),first.getMonth()+1,0).getDate(),ds=[...Array(n)].map((_,i)=>iso(new Date(first.getFullYear(),first.getMonth(),i+1)));
 const head=ds.map(k=>{const c=absent(k).length,w=pd(k).getDay();return`<th class="${c>=2?'al':w?'':'dim'}" title="${c>=2?c+' absents ce jour':''}">${DAYS[w][0]}<br>${+k.slice(8)}</th>`}).join('');
 const rows=S.users.map(u=>`<tr><td class="n">${esc(u.name)}</td>${ds.map(k=>{const w=pd(k).getDay(),rs=S.reqs.filter(r=>r.uid===u.id&&live(r)&&r.from<=k&&k<=r.to&&w);return`<td class="c ${w===+u.rest&&!rs.length?'r':w?'':'dim'}${rs.length&&u.id===me.id?' mine':''}" data-k="${k}">${rs.map(r=>`<i class="${ty(r)} ${r.status==='ok'||r.status==='annul'?'ok':'p'}${r.status==='annul'?' x':''}${ty(r)==='hr'?' '+r.half:''}"></i>`).join('')}</td>`}).join('')}</tr>`).join('');
-$('#m').innerHTML=`<div class="card"><div class="row"><h2>${first.toLocaleDateString('fr-FR',{month:'long',year:'numeric'})}</h2><span><button class="btn sec sm" id="pv">‹</button> <button class="btn sec sm" id="td">Aujourd’hui</button> <button class="btn sec sm" id="nx">›</button></span></div><div class="wrap"><table><tr><th class="n"></th>${head}</tr>${rows}</table></div><div class="leg"><span><i class="cp ok"></i>Congés payés</span><span><i class="rp ok"></i>Repos</span><span><i class="hr ok"></i>Demande d'horaires (demi-journée)</span><span><i class="cp p"></i><i class="rp p"></i><i class="hr p"></i>Hachuré : en attente · plein : validé par le dirigeant</span><span><i class="r"></i>Jour de repos fixe</span><span><i style="background:var(--badbg);border:1px solid var(--bad)"></i>2 absents ou plus</span><span><i class="cp ok x"></i>Plus clair : annulation demandée</span></div></div>${panel()}`;
+$('#m').innerHTML=`<div class="card"><div class="row"><h2>${first.toLocaleDateString('fr-FR',{month:'long',year:'numeric'})}</h2><span><button class="btn sec sm" id="pv">‹</button> <button class="btn sec sm" id="td">Aujourd’hui</button> <button class="btn sec sm" id="nx">›</button></span></div><div class="wrap"><table><tr><th class="n"></th>${head}</tr>${rows}</table></div><div class="leg"><span><i class="cp ok"></i>Congés payés</span><span><i class="rp ok"></i>Repos</span><span><i class="hr ok"></i>Demande d'horaires (demi-journée)</span><span><i class="fo ok"></i>Formation</span><span><i class="cp p"></i><i class="rp p"></i><i class="hr p"></i>Hachuré : en attente · plein : validé par le dirigeant</span><span><i class="r"></i>Jour de repos fixe</span><span><i style="background:var(--badbg);border:1px solid var(--bad)"></i>2 absents ou plus</span><span><i class="cp ok x"></i>Plus clair : annulation demandée</span></div></div>${panel()}`;
 $('#pv').onclick=()=>{mo--;render()};$('#nx').onclick=()=>{mo++;render()};$('#td').onclick=()=>{mo=0;render()};
 document.querySelectorAll('td.mine').forEach(td=>td.onclick=()=>{const k=td.dataset.k;SEL=S.reqs.filter(r=>r.uid===me.id&&live(r)&&r.from<=k&&k<=r.to&&pd(k).getDay()).map(r=>r.id);render()});
 if($('#cl'))$('#cl').onclick=()=>{SEL=[];render()};bindCancel()}
 function mine(){const b=bal(me),my=S.reqs.filter(r=>r.uid===me.id).sort((a,c)=>c.from.localeCompare(a.from));
 $('#m').innerHTML=`<div class="grid"><div class="card"><h2>Mes soldes (jours ouvrables)</h2><div class="bal"><div><b>${b.left}</b><span>disponibles</span></div><div><b>${b.acq}</b><span>acquis depuis le démarrage (2,5 j/mois)</span></div><div><b>${b.rep}</b><span>solde de départ</span></div><div><b>${b.wait}</b><span>en attente</span></div></div></div>
-<div class="card"><h2>Nouvelle demande</h2><label for="f0">Type de demande</label><select id="f0">${Object.entries(TY).map(([k,l])=>`<option value="${k}"${F.type===k?' selected':''}>${l}</option>`).join('')}</select><label for="f1">${F.type==='hr'?'Date':'Du'}</label><input type="date" id="f1" value="${F.a}">${F.type==='hr'?`<label for="f3">Demi-journée</label><select id="f3"><option value="m"${F.h==='m'?' selected':''}>Matin</option><option value="a"${F.h==='a'?' selected':''}>Après-midi</option></select>`:`<label for="f2">Au (inclus)</label><input type="date" id="f2" value="${F.c}">`}<div id="pv"></div><p><button class="btn" id="sb">Envoyer la demande</button></p></div></div>
-<div class="card"><h2>Historique</h2>${my.length?my.map(r=>`<div class="row"><span>${fmt(r)}</span><span><span class="chip c-${r.status}">${ST[r.status]}</span> ${cancelBtn(r)}</span></div>`).join(''):'<p class="mut">Aucune demande pour le moment. Posez votre premier congé ci-dessus.</p>'}</div>`;
+<div class="card"><h2>Nouvelle demande</h2><label for="f0">Type de demande</label><select id="f0">${Object.entries(TY).filter(([k])=>k!=='fo').map(([k,l])=>`<option value="${k}"${F.type===k?' selected':''}>${l}</option>`).join('')}</select><label for="f1">${F.type==='hr'?'Date':'Du'}</label><input type="date" id="f1" value="${F.a}">${F.type==='hr'?`<label for="f3">Demi-journée</label><select id="f3"><option value="m"${F.h==='m'?' selected':''}>Matin</option><option value="a"${F.h==='a'?' selected':''}>Après-midi</option></select>`:`<label for="f2">Au (inclus)</label><input type="date" id="f2" value="${F.c}">`}<div id="pv"></div><p><button class="btn" id="sb">Envoyer la demande</button></p></div></div>
+${foCard()}<div class="card"><h2>Historique</h2>${my.length?my.map(r=>`<div class="row"><span>${fmt(r)}</span><span><span class="chip c-${r.status}">${ST[r.status]}</span> ${cancelBtn(r)}</span></div>`).join(''):'<p class="mut">Aucune demande pour le moment. Posez votre premier congé ci-dessus.</p>'}</div>`;
 const pv=()=>{const t=F.type,a=F.a,c=t==='hr'?a:F.c;let h='',bad=0;const er=m=>{h+=`<div class="note bad">${m}</div>`;bad=1};
 if(!a||!c||c<a)er('La date de fin doit suivre la date de début.');
 else{const d=nd(a,c),o=t==='hr'?{}:overlaps(me.id,a,c),sd=pd(a).getDay(),ed=pd(c).getDay();
@@ -167,7 +169,18 @@ $('#sb').onclick=()=>{const hr=F.type==='hr',status=me.role==='D'?'ok':me.role==
 const r={uid:me.id,type:F.type,from:F.a,to:hr?F.a:F.c,half:hr?F.h:null,status};
 if(me.role!=='D')NOTE=r;view='plan';mo=(pd(r.from).getFullYear()-T.getFullYear())*12+pd(r.from).getMonth()-T.getMonth();
 act(sb.from('requests').insert({uid:r.uid,type:r.type,from_date:r.from,to_date:r.to,half:r.half,status}))};
-bindCancel()}
+bindCancel();bindFo()}
+function foCard(){if(me.role==='E')return'';
+if(!FO.uid)FO.uid=(S.users.find(u=>u.role==='E')||S.users[0]).id;
+const l=S.reqs.filter(r=>ty(r)==='fo'&&r.to>=iso(T)).sort((a,b)=>a.from.localeCompare(b.from));
+return`<div class="card"><h2>Planifier une formation</h2><div class="grid"><div><label for="fu">Collaborateur</label><select id="fu">${S.users.map(u=>`<option value="${u.id}"${FO.uid===u.id?' selected':''}>${esc(u.name)}</option>`).join('')}</select></div><div></div><div><label for="fa">Du</label><input type="date" id="fa" value="${FO.a}"></div><div><label for="fc">Au (inclus)</label><input type="date" id="fc" value="${FO.c}"></div></div><div id="fm"></div><p><button class="btn" id="fs">Enregistrer la formation</button></p>${l.length?'<p><b>Formations à venir</b></p>'+l.map(r=>`<div class="row"><span><b>${esc((U(r.uid)||{name:'?'}).name)}</b> · ${fmt(r)}</span><button class="btn bad sm" data-d="${r.id}">Supprimer</button></div>`).join(''):''}</div>`}
+function bindFo(){if(!$('#fs'))return;
+const chk=()=>{const o=S.reqs.filter(r=>r.uid===FO.uid&&live(r)&&ty(r)!=='hr'&&r.from<=FO.c&&FO.a<=r.to);let h='',bad=0;
+if(!FO.a||!FO.c||FO.c<FO.a){h='<div class="note bad">La date de fin doit suivre la date de début.</div>';bad=1}
+else if(o.length)h='<div class="note">⚠ Cette personne a déjà une absence sur ces dates : '+o.map(r=>TY[ty(r)]).join(', ')+'.</div>';
+$('#fm').innerHTML=h;$('#fs').disabled=bad;$('#fs').style.opacity=bad?.5:1};
+$('#fu').onchange=e=>{FO.uid=e.target.value;chk()};$('#fa').oninput=e=>{FO.a=e.target.value;chk()};$('#fc').oninput=e=>{FO.c=e.target.value;chk()};chk();
+$('#fs').onclick=()=>{view='plan';mo=(pd(FO.a).getFullYear()-T.getFullYear())*12+pd(FO.a).getMonth()-T.getMonth();act(sb.from('requests').insert({uid:FO.uid,type:'fo',from_date:FO.a,to_date:FO.c,half:null,status:'ok'})).then(()=>{if(!ERR){OKMSG='Formation enregistrée.';render()}})}}
 function extra(){const w=S.reqs.filter(r=>r.status==='manager'||(r.status==='annul'&&(U(r.uid)||{}).role==='E')),k=S.reqs.filter(r=>r.status==='ko'&&r.by==='M');
 const L=(a,f)=>a.map(r=>`<div class="row"><span><b>${esc((U(r.uid)||{name:'?'}).name)}</b> · ${fmt(r)}</span>${f(r)}</div>`).join('');
 return`<div class="card"><h2>En cours chez le manager</h2>${w.length?L(w,r=>`<span class="chip c-${r.status}">${r.status==='annul'?'Annulation chez le manager':'En attente du manager'}</span>`):'<p class="mut">Aucune demande en cours chez le manager.</p>'}</div><div class="card"><h2>Refusées par le manager</h2>${k.length?L(k,r=>`<span><span class="chip c-ko">Refusée</span> <button class="btn sec sm" data-b="${r.id}">Réexaminer</button></span>`):'<p class="mut">Aucun refus du manager.</p>'}</div>`}
